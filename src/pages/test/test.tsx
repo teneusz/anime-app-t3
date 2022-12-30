@@ -1,5 +1,6 @@
 const test = () => {
-    return <div> Hello World</div>
+
+  return <div></div>;
 
 }
 
