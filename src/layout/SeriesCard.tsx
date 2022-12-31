@@ -1,4 +1,4 @@
-import { SeriesLink } from "../server/trpc/router/anime";
+import type { SeriesLink } from "../server/trpc/router/anime";
 import { trpc } from "../utils/trpc";
 import Link from "next/link";
 import React from "react";

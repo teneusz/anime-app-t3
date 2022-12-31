@@ -17,7 +17,7 @@ const AnimePage = () => {
 
 
 const OtherSeries = ({ originalUrl, anime }: { originalUrl: string, anime: string }) => {
-  return <></>;
+  return <>{originalUrl} {"==>"} {anime}</>;
 };
 const NormalSeries = ({ originalUrl, anime }: { originalUrl: string, anime: string }) => {
   const query = trpc.anime.getSeriesLink.useQuery({ link: originalUrl });
