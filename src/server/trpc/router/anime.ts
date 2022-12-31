@@ -6,7 +6,6 @@ import * as cheerio from "cheerio";
 import axiosInstance from "../../../utils/AxiosInstance";
 import { readFromCache, saveToCache } from "../../common/cache";
 
-
 export const animeRouter = router({
   getAll: publicProcedure.query(async () => {
     const url = "https://wbijam.pl";

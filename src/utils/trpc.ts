@@ -22,8 +22,7 @@ export const trpc = createTRPCNext<AppRouter>({
             (opts.direction === "down" && opts.result instanceof Error),
         }),
         httpBatchLink({
-          url: `${getBaseUrl()}/api/trpc`,
-          maxURLLength: 1024
+          url: `${getBaseUrl()}/api/trpc`
         }),
       ],
     };

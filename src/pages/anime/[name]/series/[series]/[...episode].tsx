@@ -19,6 +19,21 @@ const EpisodePage = () => {
   const [selected, setSelected] = useState("");
 
   const entries = foo(episodeQuery.data ?? []);
+  const [nextEp, setNextEp] = useState("0");
+  const [prEp, setPrEp] = useState("0");
+
+  useEffect(() => {
+    if (episode) {
+      const iEpisode = parseInt((episode as string));
+      setNextEp((iEpisode + 1).toString().padStart(episode.length + 1, "0"));
+      setPrEp((iEpisode - 1).toString().padStart(episode.length + 1, "0"));
+
+
+      {
+        console.log({ episode, epL: episode?.length });
+      }
+    }
+  }, [episode]);
 
   const videoElement = () => {
     switch (selected) {
@@ -28,17 +43,15 @@ const EpisodePage = () => {
         return <iframe src={entries.get(selected)} width={800} height={600} />;
     }
   };
-
-
-  return <Layout>
+  return <Layout backTo={`/anime/${name}/foo/${name}.wbijam.pl_`}>
     <div>
       <div className={"flex flex-row"}>
-        <AnimeLink anime={(name as string)} series={(series as string)} episode={parseInt((episode as string)) - 1}
+        <AnimeLink anime={(name as string)} series={(series as string)} episode={prEp}
                    next={false} />
         <div>
           <div className={"flex flex-row gap-2"}>
             {
-              Array.from(entries.entries()).map(([key, value], idx) => (
+              Array.from(entries.entries()).map(([key, value]) => (
                 <div key={key} onClick={() => {
                   setSelected(key);
                 }}
@@ -49,7 +62,7 @@ const EpisodePage = () => {
           </div>
           {videoElement()}
         </div>
-        <AnimeLink anime={(name as string)} series={(series as string)} episode={parseInt((episode as string)) + 1}
+        <AnimeLink anime={(name as string)} series={(series as string)} episode={nextEp}
                    next={true} />
       </div>
     </div>
@@ -61,7 +74,7 @@ const SibnetVideo = (props: { src: string }) => {
   const streamingResult = trpc.streaming.sibnet.useQuery({ src: props.src });
   return <div>
     {
-      streamingResult.isSuccess && <VideoComponent src={streamingResult.data ?? ""} />
+      <VideoComponent src={streamingResult.data ?? ""} />
     }
   </div>;
 };
@@ -84,7 +97,7 @@ const AnimeLink = ({
                      series,
                      episode,
                      next
-                   }: { anime: string, series: string, episode: number, next: boolean }) => {
+                   }: { anime: string, series: string, episode: string, next: boolean }) => {
   const router = useRouter();
   const [current, max] = router.query.episode ?? [] as string[];
   const [disabled, setDisabled] = useState(true);
@@ -116,7 +129,7 @@ const foo = (data: { stream: string, videoLink: string }[]) => {
   data.forEach(e => {
     map.set(e.stream, e.videoLink);
   });
-
+  console.log({ map, foo: "foo" });
   return map;
 };
 

@@ -2,7 +2,8 @@ import { useRouter } from "next/router";
 import { trpc } from "../../../../utils/trpc";
 import Layout from "../../../../layout/Layout";
 import React from "react";
-import SeriesCard from "../../../../layout/SeriesCard";
+import { EpisodeLink, SeriesLink } from "../../../../server/trpc/router/anime";
+import Link from "next/link";
 
 const AnimePage = () => {
   const { query: { url, name } } = useRouter();
@@ -24,23 +25,49 @@ const NormalSeries = ({ originalUrl, anime }: { originalUrl: string, anime: stri
   const aniList = trpc.anime.getAnimeInfo.useQuery({ name: anime }).data;
 
   return <Layout>
-    <div className={"p-3 bg-blue-300 min-w-fit w-full min-h-max bg-contain bg-no-repeat  bg-cover "} style={{
-      backgroundPosition: "50% 35%",
-      height: "400px",
-      backgroundImage: `url('${aniList?.data.Media.bannerImage ?? ""}')`
-    }}>
-      <div className={" flex flex-col flex-auto h-full w-full "}>
-        <div className={" bg-black bg-opacity-60 p-2"}>
-          <a href={originalUrl}
-             className={"text-white font-mono font-black"}>{aniList?.data?.Media.title.romaji} - {anime}</a>
-        </div>
-        <div className={`flex flex-row gap-2 h-5/6 p-2 `}>
-          {query.data?.map(e => (
-            <SeriesCard series={e} key={`${e.id}-${e.label}-${originalUrl}`} originLink={originalUrl} />)) ?? <></>}
-        </div>
+    <div className={"p-3 bg-blue-300 bg-contain bg-no-repeat  bg-cover h-max max-w-full"}>
+      <AnimeTitle aniTitle={aniList?.data?.Media.title.romaji ?? ""} ogName={anime} originalUrl={originalUrl} />
+      <div className={`grid `}>
+        {query.data?.map(e => (
+          <SeriesEpisodes series={e} key={`${e.id}-${e.label}-${originalUrl}`} originLink={originalUrl} />)) ?? <></>}
       </div>
     </div>
   </Layout>;
+};
+
+const AnimeTitle = ({ aniTitle, ogName, originalUrl }: { aniTitle: string, ogName: string, originalUrl: string }) => {
+  return <div className={" bg-black bg-opacity-60 p-2"}>
+    <a href={originalUrl}
+       className={"text-white font-mono font-black"}>{aniTitle} - {ogName}</a>
+  </div>;
+};
+
+const SeriesEpisodes = ({ series, originLink }: { series: SeriesLink, originLink: string }) => {
+  const episodes = trpc.anime.getEpisodes.useQuery({
+    link: series.url,
+    originLink
+  });
+  const maxEpisode = Math.max(...(episodes.data?.map(e => parseInt(e.episode)) ?? [0]));
+
+  return <div className={"flex flex-col overflow-auto max-w-full"}>
+    <div>
+      {series.label}
+    </div>
+    <div className={"flex flex-row gap-2 overflow-auto max-w-full"}>
+      {episodes.data?.sort((ep1, ep2) => ep1.label.localeCompare(ep2.label)).map((ep) => {
+        return <EpisodeCard episode={ep} key={ep.url} maxEpisode={maxEpisode} />;
+      })
+      }
+    </div>
+  </div>;
+};
+
+const EpisodeCard = ({ episode, maxEpisode }: { episode: EpisodeLink, maxEpisode: number }) => {
+  return <Link href={`/anime/${episode.anime}/series/${episode.seriesName}/${episode.episode}/${maxEpisode}`}>
+    <div className={"bg-black bg-opacity-60 h-60 w-60"}>
+      {episode.label}
+    </div>
+  </Link>;
 };
 
 
