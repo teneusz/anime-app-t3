@@ -96,15 +96,14 @@ export const animeRouter = router({
       if (cache.loaded) {
         return cache.data;
       }
-      return await axios.get(input.link).then(response => {
-        const $ = cheerio.load(response.data);
+      return await axios.get(input.link).then(() => {
         const result: OtherSeries[] = [];
 
-        $(".lista").each((idx, element) => {
-          //TODO :)
-          // const seriesName = element.previousSibling ? $(element.previousSibling)?.text() ?? "" : ""; //h1 with name
-          // element; //table with episodes
-        });
+        // $(".lista").each((idx, element) => {
+        //   //TODO :)
+        //   // const seriesName = element.previousSibling ? $(element.previousSibling)?.text() ?? "" : ""; //h1 with name
+        //   // element; //table with episodes
+        // });
 
         saveToCache(input.link, result);
         return result;
